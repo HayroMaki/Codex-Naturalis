@@ -88,4 +88,8 @@ public class Pile<Card> {
     public Card RemoveFromPile() {
         return pile.removeFirst();
     }
+
+    public void add(Card card) {
+        pile.add(card);
+    }
 }

@@ -23,7 +23,7 @@ public class StartCard implements Card {
     private Point coordinate;
     private boolean isPlaced;
 
-    public StartCard(Ressource topLeft, Ressource topRight, Ressource bottomRight, Ressource bottomLeft) {
+    public StartCard(Ressource topLeft, Ressource topRight, Ressource bottomLeft, Ressource bottomRight) {
         Objects.requireNonNull(topLeft);
         Objects.requireNonNull(topRight);
         Objects.requireNonNull(bottomRight);
@@ -44,6 +44,16 @@ public class StartCard implements Card {
         this.isVerso = false; //for later
         this.isPlaced = false;
 
+    }
+
+    @Override
+    public String toString() {
+        return "StartCard{" +
+                "topLeft=" + topLeft +
+                ", topRight=" + topRight +
+                ", bottomRight=" + bottomRight +
+                ", bottomLeft=" + bottomLeft +
+                "}\n";
     }
 
     @Override

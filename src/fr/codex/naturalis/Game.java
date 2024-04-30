@@ -10,38 +10,38 @@ import fr.codex.naturalis.card.RessourceCard;
 import fr.codex.naturalis.card.StartCard;
 import fr.codex.naturalis.drawing.CardDrawingSequence;
 import fr.codex.naturalis.placing.PlacingCorner;
-import fr.codex.naturalis.player.Player;
 
 import java.awt.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Scanner;
+
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 
 public class Game {
     private final int ratio;
     private ArrayList<Card> allCards;
-    private final Pile<RessourceCard> ressourceCardPile;
-    private final Pile<GildingCard> gildingCardPile;
+    public final Pile<RessourceCard> ressourceCardPile;
+    public final Pile<GildingCard> gildingCardPile;
     private final ArrayList<Card> placedCards;
-    private Color backgroundColor;
+    public final ArrayList<StartCard> startCards;
+    private final Color backgroundColor;
 
     public Game(int ratio) {
-        ressourceCardPile = new Pile<RessourceCard>();
-        gildingCardPile = new Pile<GildingCard>();
         placedCards = new ArrayList<Card>();
 
         if (ratio < 100) throw new IllegalArgumentException("ratio must be at least of 100.");
         this.ratio = ratio;
 
+        ressourceCardPile = new Pile<RessourceCard>();
+        gildingCardPile = new Pile<GildingCard>();
+        startCards = new ArrayList<>();
+        createPiles();
+
         this.backgroundColor = new Color(250, 240, 230);
     }
 
-    private void initRessourcePile() {
-
-    }
     /**
      * Start the game and its graphical interface.
      */
@@ -114,6 +114,11 @@ public class Game {
         });
     }
 
+    private void StartingSequence(ApplicationContext context) {
+        Objects.requireNonNull(context);
+
+    }
+
     private void startPlacingSequence(ApplicationContext context ,int width, int height, int diff) {
         boolean placedACard = false;
         do {
@@ -135,11 +140,9 @@ public class Game {
 
         } while (placedACard);
     }
-
     private void placingSequenceLoop() {
 
     }
-
     /**
      * Make the player with this player ID pick a RessourceCard from the ressource cards Pile.
      * Adding the picked card into their deck and removing the card from the pile.
@@ -147,7 +150,6 @@ public class Game {
      * @param playerID the ID of the player.
      */
     private void PlayerPickRessourcePile(int playerID) {}
-
     /**
      * Make the player with this player ID pick a GildingCard from the gilding cards Pile.
      * Adding the picked card into their deck and removing the card from the pile.
@@ -155,4 +157,89 @@ public class Game {
      * @param playerID the ID of the player.
      */
     private void PlayerPickGildingPile(int playerID) {}
+    private void createPiles() {
+        Map<String,Corner> cornerMap = Map.of(
+                "Empty", Corner.empty,
+                "Invisible",Corner.invisible,
+                "R:Insect",Corner.insect,
+                "R:Animal",Corner.animal,
+                "R:Fungi",Corner.fungi,
+                "R:Plant",Corner.plant,
+                "A:Quill",Corner.feather,
+                "A:Manuscript",Corner.scroll,
+                "A:Inkwell",Corner.ink );
+
+        Map<String,Ressource> ressourceMap = Map.of(
+                "R:Insect",Corner.insect,
+                "R:Animal",Corner.animal,
+                "R:Fungi",Corner.fungi,
+                "R:Plant",Corner.plant );
+
+        Path path = Path.of("data", "deck.txt");
+        try (var reader = Files.newBufferedReader(path, ISO_8859_1)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("StarterCard")) {
+                    readStarterCard(line,ressourceMap);
+                } else if (line.startsWith("ResourceCard")) {
+                    readRessourceCard(line,cornerMap,ressourceMap);
+                } else if (line.startsWith("GoldCard")) {
+                    readGildingCard(line,cornerMap,ressourceMap);
+                } else if (line.startsWith("Objective")) {
+                    // ignore for now.
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("couldn't read the file "+ "deck.txt" +".");
+        }
+    }
+    private void readStarterCard(String line, Map<String,Ressource> ressourceMap) {
+        String[] lineList = line.split(" ");
+        Ressource topLeft = ressourceMap.get(lineList[2]);
+        Ressource topRight = ressourceMap.get(lineList[3]);
+        Ressource botLeft = ressourceMap.get(lineList[4]);
+        Ressource botRight = ressourceMap.get(lineList[5]);
+        //Verso later.
+        StartCard card = new StartCard(topLeft,topRight,botLeft,botRight);
+        startCards.add(card);
+    }
+    private void readRessourceCard(String line, Map<String,Corner> cornerMap, Map<String,Ressource> ressourceMap) {
+        String[] lineList = line.split(" ");
+        Corner topLeft = cornerMap.get(lineList[2]);
+        Corner topRight = cornerMap.get(lineList[3]);
+        Corner botLeft = cornerMap.get(lineList[4]);
+        Corner botRight = cornerMap.get(lineList[5]);
+        Ressource type = ressourceMap.get(lineList[7]);
+        int point;
+        if (lineList[9].equals("None")) {
+            point = 0;
+        } else {
+            point = (int) lineList[9].charAt(3);
+        }
+        //Verso later.
+        RessourceCard card = new RessourceCard(type,topLeft,topRight,botLeft,botRight,point);
+        ressourceCardPile.add(card);
+    }
+    private void readGildingCard(String line, Map<String,Corner> cornerMap, Map<String,Ressource> ressourceMap) {
+        String[] lineList = line.split(" ");
+        Corner topLeft = cornerMap.get(lineList[2]);
+        Corner topRight = cornerMap.get(lineList[3]);
+        Corner botLeft = cornerMap.get(lineList[4]);
+        Corner botRight = cornerMap.get(lineList[5]);
+        Ressource type = ressourceMap.get(lineList[7]);
+        int point;
+        int len = lineList.length-1;
+        if (lineList[len].equals("None")) {
+            point = 0;
+        } else {
+            point = (int) lineList[len].charAt(3);
+        }
+        var cost = new ArrayList<Ressource>();
+        for (int i = 10 ; i < (len-2); i++) {
+            cost.add(ressourceMap.get(lineList[i]));
+        }
+        //Verso later.
+        GildingCard card = new GildingCard(type,point,topLeft,topRight,botLeft,botRight,List.copyOf(cost));
+        gildingCardPile.add(card);
+    }
 }

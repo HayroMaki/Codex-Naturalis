@@ -24,7 +24,7 @@ public class GildingCard implements Card {
     private Point coordinate;
     private boolean isPlaced;
 
-    public GildingCard(Ressource type, int point, Corner topLeft, Corner topRight, Corner bottomRight, Corner bottomLeft, List<Ressource> cost) {
+    public GildingCard(Ressource type, int point, Corner topLeft, Corner topRight, Corner bottomLeft, Corner bottomRight, List<Ressource> cost) {
         Objects.requireNonNull(type);
         Objects.requireNonNull(topLeft);
         Objects.requireNonNull(topRight);
