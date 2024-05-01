@@ -19,10 +19,9 @@ public class RessourceDrawingSequence {
         height = width / 2;
         cornerSize = (height / 2) - (height / 10);
     }
-
     public void drawInformationBanner() {
-        int x = width/2;
         int diff = cornerSize/2;
+        int x = width/2 - 7*diff;
         drawAnimal(x,0); x += diff;
         drawValue(x,0,Ressource.animal); x += diff;
         drawInsect(x,0); x += diff;
@@ -31,7 +30,12 @@ public class RessourceDrawingSequence {
         drawValue(x,0,Ressource.fungi); x += diff;
         drawPlant(x,0); x += diff;
         drawValue(x,0,Ressource.plant); x += diff;
-
+        drawScroll(x,0); x += diff;
+        drawValue(x,0,Artifact.scroll); x += diff;
+        drawInk(x,0); x += diff;
+        drawValue(x,0,Artifact.ink); x += diff;
+        drawFeather(x,0); x += diff;
+        drawValue(x,0,Artifact.feather); x += diff;
     }
     private void drawAnimal(int x, int y) {
         graphics2D.setColor(Ressource.animal.getSecondaryColor());

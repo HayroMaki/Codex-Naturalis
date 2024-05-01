@@ -56,8 +56,9 @@ public class Game {
             int diff = (int)(ratio/((float) 16/3));
             // Choose a StartCard :
             startingSequence(context,width,height);
-
+            if (placedCards.isEmpty()) {return;}
             for (;;) {
+                //drawInformationBanner(context,width,height);
                 drawPlacedCards(context);
 
                 Event event = context.pollOrWaitEvent(2147483647); //maximum int value
@@ -83,27 +84,6 @@ public class Game {
             }
         });
     }
-
-    public void drawInformationBanner(ApplicationContext context ,int width, int height) {
-        context.renderFrame(graphics2D -> {
-            RessourceDrawingSequence ressourceDrawingSequence = new RessourceDrawingSequence(graphics2D,width);
-            ressourceDrawingSequence.drawInformationBanner();
-        });
-    }
-    /**
-     * Draw every card in the placedCards List.
-     *
-     * @param context the ApplicationContext of the actual Application. (insert "context").
-     */
-    private void drawPlacedCards(ApplicationContext context) {
-        Objects.requireNonNull(context);
-        context.renderFrame(graphics2D -> {
-            var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
-            for (Card card : placedCards) {
-                cardDrawingSequence.drawCard(card);
-            }
-        });
-    }
     /**
      * The starting sequence that will let the player choose between 2 random StartCard and place the one he chooses.
      * @param context the ApplicationContext.
@@ -114,6 +94,7 @@ public class Game {
         Objects.requireNonNull(context);
         StartCard chosenCard = chooseStartingCard(context, width, height);
         chosenCard.place(width/2-ratio/2,height/2-ratio/4);
+        context.renderFrame(graphics2D -> {graphics2D.clearRect(0,0,width,height);});
     }
     /**
      * Take 2 random cards and place them in the middle of the screen for the player to choose one.
@@ -124,8 +105,8 @@ public class Game {
      */
     private StartCard chooseStartingCard(ApplicationContext context, int width, int height) {
         Objects.requireNonNull(context);
-        var x1 = width/2-2*ratio; var y1 = height/2-ratio/4;
-        var x2 = width/2+ratio;   var y2 = height/2-ratio/4;
+        var x1 = width/2-(int)(1.5*ratio); var y1 = height/2-ratio/4;
+        var x2 = width/2+ratio/2;   var y2 = height/2-ratio/4;
 
         StartCard card1 = randomStartCard();
         startCards.remove(card1);
@@ -137,14 +118,12 @@ public class Game {
 
         context.renderFrame(graphics2D -> {
             graphics2D.setColor(secondaryColor);
-            graphics2D.fillRect(0,height/2-ratio/4,width,ratio);
+            graphics2D.fillRect(0,height/2-ratio/2,width,ratio);
             var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
             cardDrawingSequence.drawCard(card1);
             cardDrawingSequence.drawCard(card2);
         });
-        StartCard chosenCard = checkStartCardSelection(context, x1, y1, card1, x2, y2, card2);
-        context.renderFrame(graphics2D -> {graphics2D.clearRect(0,0,width,height);});
-        return chosenCard;
+        return checkStartCardSelection(context, x1, y1, card1, x2, y2, card2);
     }
     /**
      * Loop until the player chooses one of the two StartCard.
@@ -163,7 +142,7 @@ public class Game {
         Objects.requireNonNull(card2);
         StartCard chosenCard = null;
         while (true) {
-            Event event = context.pollOrWaitEvent(2147483647); //maximum int value
+            Event event = context.pollEvent();
             if (event != null) {
                 if (event instanceof PointerEvent pointerEvent) {
                     if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
@@ -319,5 +298,26 @@ public class Game {
         //Verso later.
         GildingCard card = new GildingCard(type,point,topLeft,topRight,botLeft,botRight,List.copyOf(cost));
         gildingCardPile.add(card);
+    }
+
+    public void drawInformationBanner(ApplicationContext context ,int width, int height) {
+        context.renderFrame(graphics2D -> {
+            RessourceDrawingSequence ressourceDrawingSequence = new RessourceDrawingSequence(graphics2D,width);
+            ressourceDrawingSequence.drawInformationBanner();
+        });
+    }
+    /**
+     * Draw every card in the placedCards List.
+     *
+     * @param context the ApplicationContext of the actual Application. (insert "context").
+     */
+    private void drawPlacedCards(ApplicationContext context) {
+        Objects.requireNonNull(context);
+        context.renderFrame(graphics2D -> {
+            var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
+            for (Card card : placedCards) {
+                cardDrawingSequence.drawCard(card);
+            }
+        });
     }
 }
