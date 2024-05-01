@@ -116,18 +116,31 @@ public class Game {
         startCards.remove(card2);
         card2.changeCoordinates(x2,y2);
 
+        drawStartCardSelection(context, width, height, card1, card2);
+        return checkStartCardSelection(context, width, height, x1, y1, card1, x2, y2, card2);
+    }
+    /**
+     * draw the StartCard selection banner and the 2 cards randomly taken.
+     * @param context the ApplicationContext.
+     * @param width the screen width.
+     * @param height the screen height.
+     * @param card1 the first card.
+     * @param card2 the second card.
+     */
+    private void drawStartCardSelection(ApplicationContext context, int width, int height, StartCard card1, StartCard card2) {
         context.renderFrame(graphics2D -> {
             graphics2D.setColor(secondaryColor);
-            graphics2D.fillRect(0,height/2-ratio/2,width,ratio);
+            graphics2D.fillRect(0, height /2-ratio/2, width,ratio);
             var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
             cardDrawingSequence.drawCard(card1);
             cardDrawingSequence.drawCard(card2);
         });
-        return checkStartCardSelection(context, x1, y1, card1, x2, y2, card2);
     }
     /**
      * Loop until the player chooses one of the two StartCard.
      * @param context the ApplicationContext.
+     * @param width the screen width.
+     * @param height the screen height.
      * @param x1 the x coordinate of the first card.
      * @param y1 the y coordinate of the first card.
      * @param card1 the first card.
@@ -136,12 +149,13 @@ public class Game {
      * @param card2 the second card.
      * @return the chosen card.
      */
-    private StartCard checkStartCardSelection(ApplicationContext context, int x1, int y1, StartCard card1, int x2, int y2, StartCard card2) {
+    private StartCard checkStartCardSelection(ApplicationContext context,int width, int height, int x1, int y1, StartCard card1, int x2, int y2, StartCard card2) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(card1);
         Objects.requireNonNull(card2);
         StartCard chosenCard = null;
         while (true) {
+            drawStartCardSelection(context, width, height, card1, card2);
             Event event = context.pollEvent();
             if (event != null) {
                 if (event instanceof PointerEvent pointerEvent) {
