@@ -9,6 +9,7 @@ import fr.codex.naturalis.corner.Corner;
 import fr.codex.naturalis.corner.Ressource;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -26,7 +27,6 @@ public class CardDrawingSequence {
         cornerSize = (height / 2) - (height / 10);
         arcDiameter = (width / 5);
     }
-
     /**
      * Draw a card in the graphical interface.
      *
@@ -50,7 +50,6 @@ public class CardDrawingSequence {
             //for later
         }
     }
-
     /**
      * Draw the recto side of a RessourceCard.
      *
@@ -64,7 +63,6 @@ public class CardDrawingSequence {
             drawPointBanner(((RessourceCard)card).getPoint(), x + width/2, y);
         }
     }
-
     /**
      * Draw the recto side of a GildingCard.
      *
@@ -76,7 +74,6 @@ public class CardDrawingSequence {
         drawEveryCorners(card, x, y);
         drawPointBanner(((GildingCard)card).getPoint(), x + width/2, y);
     }
-
     /**
      * Draw the recto side of a StartCard.
      *
@@ -92,7 +89,6 @@ public class CardDrawingSequence {
         draw4EmptyCircles(centerX, centerY);
         //draw4CirclesOutlines(centerX, centerY);
     }
-
     /**
      * Draw the 4 circles in the middle of a StartCard's recto (used for drawStartCircles).
      *
@@ -107,7 +103,6 @@ public class CardDrawingSequence {
         graphics2D.fillOval(centerX, centerY + width /10, width /8, width /8);
         graphics2D.fillOval(centerX, centerY - width /10, width /8, width /8);
     }
-
     /**
      * Draw the outlines of the 4 circles in the middle of a StartCard's recto (used for drawStartCircles).
      *
@@ -142,7 +137,6 @@ public class CardDrawingSequence {
         for (int i = 0; i <= 3; i++)
             drawCorner(card, corners.get(i),x, y, i);
     }
-
     /**
      * Draw the Corner, and, if there is one, it's logo (used for the drawEveryCorners method).
      *
@@ -174,13 +168,12 @@ public class CardDrawingSequence {
             drawBasicCorners(card, x, y, whichCorner, differX, differY);
 
             if (corner instanceof Ressource) {
-                drawRessource(corner, x+differX, y+differY);
+                drawRessource((Ressource) corner, x+differX, y+differY);
             } else if (corner instanceof Artifact) {
-                drawArtifact(corner, x+differX, y+differY);
+                drawArtifact((Artifact) corner, x+differX, y+differY);
             }
         }
     }
-
     /**
      *
      *
@@ -203,7 +196,6 @@ public class CardDrawingSequence {
         graphics2D.fillRoundRect((x + differX), (y + differY), cornerSize - width /80, cornerSize - width /80, arc, arc);
         drawEmptyCornersAngles((x + differX), (y + differY), whichCorner);
     }
-
     /**
      * Set the graphics2D color depending on the card.
      *
@@ -215,7 +207,6 @@ public class CardDrawingSequence {
         else if (card instanceof GildingCard || card instanceof StartCard)
             graphics2D.setColor(new Color(176, 159, 34));
     }
-
     /**
      * Draw the 90° Angles of the corner depending on th side.
      *
@@ -235,7 +226,6 @@ public class CardDrawingSequence {
                 break;
         }
     }
-
     /**
      * Draw the 90° Angles of the corner depending on th side.
      *
@@ -261,36 +251,36 @@ public class CardDrawingSequence {
     /**
      *
      *
-     * @param corner
+     * @param ressource
      * @param x
      * @param y
      */
-    private void drawRessource(Corner corner, int x, int y) {
-        if (corner.equals(Corner.animal)) {
-            drawAnimal(corner, x, y);
-        } else if (corner.equals(Corner.fungi)) {
-            drawFungi(corner, x, y);
-        } else if (corner.equals(Corner.insect)) {
-            drawInsect(corner, x, y);
-        } else if (corner.equals(Corner.plant)) {
-            drawPlant(corner, x, y);
+    private void drawRessource(Ressource ressource, int x, int y) {
+        if (ressource.equals(Corner.animal)) {
+            drawAnimal(ressource, x, y);
+        } else if (ressource.equals(Corner.fungi)) {
+            drawFungi(ressource, x, y);
+        } else if (ressource.equals(Corner.insect)) {
+            drawInsect(ressource, x, y);
+        } else if (ressource.equals(Corner.plant)) {
+            drawPlant(ressource, x, y);
         }
     }
 
     /**
      *
      *
-     * @param corner
+     * @param artifact
      * @param x
      * @param y
      */
-    private void drawArtifact(Corner corner, int x, int y) {
-        if (corner.equals(Corner.scroll)) {
-            drawScroll(corner, x, y);
-        } else if (corner.equals(Corner.ink)) {
-            drawInk(corner, x, y);
-        } else if (corner.equals(Corner.feather)) {
-            drawFeather(corner, x, y);
+    private void drawArtifact(Artifact artifact, int x, int y) {
+        if (artifact.equals(Corner.scroll)) {
+            drawScroll(artifact, x, y);
+        } else if (artifact.equals(Corner.ink)) {
+            drawInk(artifact, x, y);
+        } else if (artifact.equals(Corner.feather)) {
+            drawFeather(artifact, x, y);
         }
     }
 
@@ -320,38 +310,38 @@ public class CardDrawingSequence {
         graphics2D.drawChars(strPoint,0,1,x-width/38, y + width/14);
     }
 
-    private void drawAnimal(Corner corner, int x, int y) {
-        graphics2D.setColor(((Ressource)corner).getSecondaryColor());
+    private void drawAnimal(Ressource ressource, int x, int y) {
+        graphics2D.setColor(ressource.getSecondaryColor());
         graphics2D.fillRect(x+cornerSize/5, y+cornerSize/5, cornerSize/2, cornerSize/2);
     }
 
-    private void drawFungi(Corner corner, int x, int y) {
-        graphics2D.setColor(((Ressource)corner).getSecondaryColor());
+    private void drawFungi(Ressource ressource, int x, int y) {
+        graphics2D.setColor(ressource.getSecondaryColor());
         graphics2D.fillRect(x+cornerSize/5, y+cornerSize/5, cornerSize/2, cornerSize/2);
     }
 
-    private void drawInsect(Corner corner, int x, int y) {
-        graphics2D.setColor(((Ressource)corner).getSecondaryColor());
+    private void drawInsect(Ressource ressource, int x, int y) {
+        graphics2D.setColor(ressource.getSecondaryColor());
         graphics2D.fillRect(x+cornerSize/5, y+cornerSize/5, cornerSize/2, cornerSize/2);
     }
 
-    private void drawPlant(Corner corner, int x, int y) {
-        graphics2D.setColor(((Ressource)corner).getSecondaryColor());
+    private void drawPlant(Ressource ressource, int x, int y) {
+        graphics2D.setColor(ressource.getSecondaryColor());
         graphics2D.fillRect(x+cornerSize/5, y+cornerSize/5, cornerSize/2, cornerSize/2);
     }
 
-    private void drawScroll(Corner corner, int x, int y) {
-        graphics2D.setColor(((Artifact)corner).getMainColor());
+    private void drawScroll(Artifact artifact, int x, int y) {
+        graphics2D.setColor(artifact.getMainColor());
         graphics2D.fillRect(x+cornerSize/4, y+cornerSize/4, cornerSize/2, cornerSize/2);
     }
 
-    private void drawInk(Corner corner, int x, int y) {
-        graphics2D.setColor(((Artifact)corner).getMainColor());
+    private void drawInk(Artifact artifact, int x, int y) {
+        graphics2D.setColor(artifact.getMainColor());
         graphics2D.fillRect(x+cornerSize/4, y+cornerSize/4, cornerSize/2, cornerSize/2);
     }
 
-    private void drawFeather(Corner corner, int x, int y) {
-        graphics2D.setColor(((Artifact)corner).getMainColor());
+    private void drawFeather(Artifact artifact, int x, int y) {
+        graphics2D.setColor(artifact.getMainColor());
         graphics2D.fillRect(x+cornerSize/4, y+cornerSize/4, cornerSize/2, cornerSize/2);
     }
 }

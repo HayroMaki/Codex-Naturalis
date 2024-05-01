@@ -9,6 +9,7 @@ import fr.codex.naturalis.card.GildingCard;
 import fr.codex.naturalis.card.RessourceCard;
 import fr.codex.naturalis.card.StartCard;
 import fr.codex.naturalis.drawing.CardDrawingSequence;
+import fr.codex.naturalis.drawing.RessourceDrawingSequence;
 import fr.codex.naturalis.placing.PlacingCorner;
 
 import java.awt.*;
@@ -27,6 +28,7 @@ public class Game {
     private final ArrayList<Card> placedCards;
     public final ArrayList<StartCard> startCards;
     private final Color backgroundColor;
+    private final Color secondaryColor;
 
     public Game(int ratio) {
         placedCards = new ArrayList<Card>();
@@ -40,45 +42,31 @@ public class Game {
         createPiles();
 
         this.backgroundColor = new Color(250, 240, 230);
+        this.secondaryColor = new Color(200, 170, 140);
     }
-
     /**
      * Start the game and its graphical interface.
      */
     public void start() {
         // start the application, create a drawing area, full screen
         Application.run(backgroundColor, context -> {
-            // get the screen info
-            var screenInfo = context.getScreenInfo();
-            var width = screenInfo.width();
-            var height = screenInfo.height();
-
+            // Get the screen infos :
+            var width = context.getScreenInfo().width();
+            var height = context.getScreenInfo().height();
             int diff = (int)(ratio/((float) 16/3));
-
-            var cardX = new StartCard(Corner.animal, Corner.plant, Corner.fungi, Corner.insect);
-            cardX.changeCoordinates(width/2 - ratio/2, height/2 - ratio/4);
-
-            var cardY = new RessourceCard(Ressource.animal, Corner.animal, Corner.empty, Corner.invisible, Corner.empty, 1);
-            cardY.changeCoordinates(width/2 + ratio/2 - diff, height/2 + ratio/4 - diff);
-
-            var cardZ = new GildingCard(Ressource.insect, 2, Corner.empty, Corner.invisible, Corner.insect, Corner.scroll, List.of(Corner.insect,Corner.insect,Corner.plant));
-            cardZ.changeCoordinates(cardY.getXCoordinate(), cardX.getYCoordinate() - ratio/8 - diff);
-
-            placedCards.addAll(List.of(cardX,cardY,cardZ));
+            // Choose a StartCard :
+            startingSequence(context,width,height);
 
             for (;;) {
                 drawPlacedCards(context);
+
                 Event event = context.pollOrWaitEvent(2147483647); //maximum int value
                 if (event != null) {
-                    // debug, print the event
                     System.out.println(event);
                     switch (event) {
                         case PointerEvent pointerEvent -> {
-                            // if the mouse pointer is up
                             if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-                                // close the screen area
-                                context.dispose();
-                                return;
+                                System.out.println(pointerEvent.location());
                             }
                         }
                         case KeyboardEvent keyboardEvent -> {
@@ -91,14 +79,17 @@ public class Game {
                         }
                     }
                 }
-                context.renderFrame(graphics2D -> {
-                    graphics2D.setColor(backgroundColor);
-                    graphics2D.drawRect(0,0,width,height);
-                });
+                context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
             }
         });
     }
 
+    public void drawInformationBanner(ApplicationContext context ,int width, int height) {
+        context.renderFrame(graphics2D -> {
+            RessourceDrawingSequence ressourceDrawingSequence = new RessourceDrawingSequence(graphics2D,width);
+            ressourceDrawingSequence.drawInformationBanner();
+        });
+    }
     /**
      * Draw every card in the placedCards List.
      *
@@ -113,12 +104,99 @@ public class Game {
             }
         });
     }
-
-    private void StartingSequence(ApplicationContext context) {
+    /**
+     * The starting sequence that will let the player choose between 2 random StartCard and place the one he chooses.
+     * @param context the ApplicationContext.
+     * @param width the screen width.
+     * @param height the screen height.
+     */
+    private void startingSequence(ApplicationContext context, int width, int height) {
         Objects.requireNonNull(context);
-
+        StartCard chosenCard = chooseStartingCard(context, width, height);
+        chosenCard.place(width/2-ratio/2,height/2-ratio/4);
     }
+    /**
+     * Take 2 random cards and place them in the middle of the screen for the player to choose one.
+     * @param context the ApplicationContext.
+     * @param width the screen width.
+     * @param height the screen height.
+     * @return the chosen card.
+     */
+    private StartCard chooseStartingCard(ApplicationContext context, int width, int height) {
+        Objects.requireNonNull(context);
+        var x1 = width/2-2*ratio; var y1 = height/2-ratio/4;
+        var x2 = width/2+ratio;   var y2 = height/2-ratio/4;
 
+        StartCard card1 = randomStartCard();
+        startCards.remove(card1);
+        card1.changeCoordinates(x1,y1);
+
+        StartCard card2 = randomStartCard();
+        startCards.remove(card2);
+        card2.changeCoordinates(x2,y2);
+
+        context.renderFrame(graphics2D -> {
+            graphics2D.setColor(secondaryColor);
+            graphics2D.fillRect(0,height/2-ratio/4,width,ratio);
+            var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
+            cardDrawingSequence.drawCard(card1);
+            cardDrawingSequence.drawCard(card2);
+        });
+        StartCard chosenCard = checkStartCardSelection(context, x1, y1, card1, x2, y2, card2);
+        context.renderFrame(graphics2D -> {graphics2D.clearRect(0,0,width,height);});
+        return chosenCard;
+    }
+    /**
+     * Loop until the player chooses one of the two StartCard.
+     * @param context the ApplicationContext.
+     * @param x1 the x coordinate of the first card.
+     * @param y1 the y coordinate of the first card.
+     * @param card1 the first card.
+     * @param x2 the x coordinate of the second card.
+     * @param y2 the y coordinate of the second card.
+     * @param card2 the second card.
+     * @return the chosen card.
+     */
+    private StartCard checkStartCardSelection(ApplicationContext context, int x1, int y1, StartCard card1, int x2, int y2, StartCard card2) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(card1);
+        Objects.requireNonNull(card2);
+        StartCard chosenCard = null;
+        while (true) {
+            Event event = context.pollOrWaitEvent(2147483647); //maximum int value
+            if (event != null) {
+                if (event instanceof PointerEvent pointerEvent) {
+                    if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+                        if ((pointerEvent.location().x() >= x1 && pointerEvent.location().x() <= x1 + ratio) &&
+                            (pointerEvent.location().y() >= y1 && pointerEvent.location().y() <= y1 + ratio / 2)) {
+                            chosenCard = card1;
+                            placedCards.add(card1);
+                            startCards.add(card2);
+                            return chosenCard;
+                        }
+                        if ((pointerEvent.location().x() >= x2 && pointerEvent.location().x() <= x2 + ratio) &&
+                            (pointerEvent.location().y() >= y2 && pointerEvent.location().y() <= y2 + ratio / 2)) {
+                            chosenCard = card2;
+                            placedCards.add(card2);
+                            startCards.add(card1);
+                            return chosenCard;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * take a random StartCard from the startCards Array, if the array is empty, throw an Exception.
+     * @return a random StartCard.
+     */
+    private StartCard randomStartCard() {
+        if (!startCards.isEmpty()) {
+            Random rand = new Random();
+            return startCards.get(rand.nextInt(startCards.size()));
+        }
+        throw new EmptyStackException();
+    }
     private void startPlacingSequence(ApplicationContext context ,int width, int height, int diff) {
         boolean placedACard = false;
         do {

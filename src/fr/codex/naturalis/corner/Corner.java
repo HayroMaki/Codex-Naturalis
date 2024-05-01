@@ -22,8 +22,8 @@ public interface Corner {
     Artifact scroll = new Artifact("scroll");
     Artifact ink = new Artifact("ink");
     Artifact feather = new Artifact("feather");
-    Empty empty = new Empty();
-    Empty invisible = new Empty();
+    Empty empty = new Empty("Empty");
+    Empty invisible = new Empty("Invisible");
 
     /**
      * Return a string version of the Corner, containing its name and value.

@@ -17,9 +17,7 @@ public class StartCard implements Card {
     public boolean bottomLeftObstructed;
     public boolean bottomRightObstructed;
     private final Color color;
-
     private boolean isVerso;
-
     private Point coordinate;
     private boolean isPlaced;
 
@@ -48,54 +46,45 @@ public class StartCard implements Card {
 
     @Override
     public String toString() {
-        return "StartCard{" +
+        return "\nStartCard{" +
                 "topLeft=" + topLeft +
                 ", topRight=" + topRight +
                 ", bottomRight=" + bottomRight +
                 ", bottomLeft=" + bottomLeft +
-                "}\n";
+                "}";
     }
-
     @Override
     public boolean topLeftObstructed() {
         return topLeftObstructed;
     }
-
     @Override
     public boolean topRightObstructed() {
         return topRightObstructed;
     }
-
     @Override
     public boolean bottomLeftObstructed() {
         return bottomLeftObstructed;
     }
-
     @Override
     public boolean bottomRightObstructed() {
         return bottomRightObstructed;
     }
-
     @Override
     public void setTopLeftObstruction(boolean status) {
         topLeftObstructed = status;
     }
-
     @Override
     public void setTopRightObstruction(boolean status) {
         topRightObstructed = status;
     }
-
     @Override
     public void setBottomLeftObstruction(boolean status) {
         bottomLeftObstructed = status;
     }
-
     @Override
     public void seBottomRightObstruction(boolean status) {
         bottomRightObstructed = status;
     }
-
     /**
      * Change the coordinates of the card without placing it.
      *
@@ -108,32 +97,26 @@ public class StartCard implements Card {
             this.coordinate = new Point(x, y);
         }
     }
-
     @Override
     public int getXCoordinate() {
         return coordinate.x;
     }
-
     @Override
     public int getYCoordinate() {
         return coordinate.y;
     }
-
     @Override
     public Color getColor() {
         return color;
     }
-
     @Override
     public List<Corner> getAllCorners() {
         return List.of(topLeft,topRight,bottomLeft,bottomRight);
     }
-
     @Override
     public boolean isVerso() {
         return isVerso;
     }
-
     /**
      * Change the coordinates of the card and place it, making it unmovable.
      *

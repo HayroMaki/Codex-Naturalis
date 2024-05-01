@@ -1,7 +1,14 @@
 package fr.codex.naturalis.corner;
 
-public class Empty implements Corner {
+import java.util.Objects;
 
+public class Empty implements Corner {
+    String name;
+
+    public Empty(String name) {
+        Objects.requireNonNull(name);
+        this.name = name;
+    }
     /**
      * Return a string version of the Hollow Corner, containing only spaces.
      *
@@ -9,7 +16,7 @@ public class Empty implements Corner {
      */
     @Override
     public String toString() {
-        return "         ";
+        return name;
     }
 
     /**
