@@ -11,6 +11,7 @@ import fr.codex.naturalis.card.StartCard;
 import fr.codex.naturalis.drawing.CardDrawingSequence;
 import fr.codex.naturalis.drawing.RessourceDrawingSequence;
 import fr.codex.naturalis.placing.PlacingCorner;
+import fr.codex.naturalis.player.Player;
 
 import java.awt.*;
 import java.nio.file.Files;
@@ -54,11 +55,13 @@ public class Game {
             var width = context.getScreenInfo().width();
             var height = context.getScreenInfo().height();
             int diff = (int)(ratio/((float) 16/3));
+
             // Choose a StartCard :
             startingSequence(context,width,height);
             if (placedCards.isEmpty()) {return;}
+
             for (;;) {
-                //drawInformationBanner(context,width,height);
+                drawInformationBanner(context,width,height);
                 drawPlacedCards(context);
 
                 Event event = context.pollOrWaitEvent(2147483647); //maximum int value
@@ -71,9 +74,9 @@ public class Game {
                             }
                         }
                         case KeyboardEvent keyboardEvent -> {
-                            // if the key is "escape"
+                            // if the key is "escape" :
                             if (keyboardEvent.key() == KeyboardEvent.Key.ESCAPE) {
-                                // close the screen area
+                                // close the screen area.
                                 context.dispose();
                                 return;
                             }
@@ -190,6 +193,9 @@ public class Game {
         }
         throw new EmptyStackException();
     }
+    private void playerPickCard(Player player) {
+
+    }
     private void startPlacingSequence(ApplicationContext context ,int width, int height, int diff) {
         boolean placedACard = false;
         do {
@@ -214,20 +220,6 @@ public class Game {
     private void placingSequenceLoop() {
 
     }
-    /**
-     * Make the player with this player ID pick a RessourceCard from the ressource cards Pile.
-     * Adding the picked card into their deck and removing the card from the pile.
-     *
-     * @param playerID the ID of the player.
-     */
-    private void PlayerPickRessourcePile(int playerID) {}
-    /**
-     * Make the player with this player ID pick a GildingCard from the gilding cards Pile.
-     * Adding the picked card into their deck and removing the card from the pile.
-     *
-     * @param playerID the ID of the player.
-     */
-    private void PlayerPickGildingPile(int playerID) {}
     private void createPiles() {
         Map<String,Corner> cornerMap = Map.of(
                 "Empty", Corner.empty,

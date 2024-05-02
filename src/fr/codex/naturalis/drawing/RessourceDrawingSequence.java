@@ -74,6 +74,7 @@ public class RessourceDrawingSequence {
     private void drawValue(int x, int y, Corner corner) {
         graphics2D.setColor(new Color(87, 66, 11));
         graphics2D.setFont(new Font("grand", Font.BOLD,width/12));
-        graphics2D.drawChars(Integer.toString(corner.getValue()).toCharArray(),0,5,x,y);
+        char[] str = Integer.toString(corner.getValue()).toCharArray();
+        graphics2D.drawChars(str,0,str.length,x,y);
     }
 }
