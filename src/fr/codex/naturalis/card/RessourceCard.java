@@ -50,45 +50,48 @@ public class RessourceCard implements Card {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RessourceCard that = (RessourceCard) o;
+        return point == that.point && Objects.equals(type, that.type) && Objects.equals(topLeft, that.topLeft) && Objects.equals(topRight, that.topRight) && Objects.equals(bottomLeft, that.bottomLeft) && Objects.equals(bottomRight, that.bottomRight);
+    }
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, topLeft, topRight, bottomLeft, bottomRight, point);
+    }
+    @Override
     public boolean topLeftObstructed() {
         return topLeftObstructed;
     }
-
     @Override
     public boolean topRightObstructed() {
         return topRightObstructed;
     }
-
     @Override
     public boolean bottomLeftObstructed() {
         return bottomLeftObstructed;
     }
-
     @Override
     public boolean bottomRightObstructed() {
         return bottomRightObstructed;
     }
-
     @Override
     public void setTopLeftObstruction(boolean status) {
         topLeftObstructed = status;
     }
-
     @Override
     public void setTopRightObstruction(boolean status) {
         topRightObstructed = status;
     }
-
     @Override
     public void setBottomLeftObstruction(boolean status) {
         bottomLeftObstructed = status;
     }
-
     @Override
     public void seBottomRightObstruction(boolean status) {
         bottomRightObstructed = status;
     }
-
     @Override
     public String toString() {
         var str = new StringBuilder("Card :\n");
@@ -97,14 +100,12 @@ public class RessourceCard implements Card {
         str.append(bottomLeft).append(" | ").append(bottomRight).append("\n");
         return str.toString();
     }
-
     @Override
     public void changeCoordinates(int x, int y) {
         if (!isPlaced) {
             this.coordinate = new Point(x, y);
         }
     }
-
     @Override
     public void place(int x, int y) {
         changeCoordinates(x, y);
@@ -114,40 +115,32 @@ public class RessourceCard implements Card {
         if (bottomLeft != null) bottomLeft.increase();
         if (bottomRight != null) bottomRight.increase();
     }
-
     @Override
     public int getXCoordinate() {
         return coordinate.x;
     }
-
     @Override
     public int getYCoordinate() {
         return coordinate.y;
     }
-
     @Override
     public Color getColor() {
         return type.getMainColor();
     }
-
     public Color getSecondaryColor() {
         return type.getSecondaryColor();
     }
-
     public Color getTertiaryColor() {
         return type.getTertiaryColor();
     }
-
     @Override
     public List<Corner> getAllCorners() {
         return List.of(topLeft,topRight,bottomLeft,bottomRight);
     }
-
     @Override
     public boolean isVerso() {
         return isVerso;
     }
-
     public int getPoint() {
         return point;
     }

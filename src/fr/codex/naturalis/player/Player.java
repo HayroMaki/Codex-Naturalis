@@ -1,5 +1,6 @@
 package fr.codex.naturalis.player;
 
+import fr.codex.naturalis.card.Card;
 import fr.codex.naturalis.challenge.Challenge;
 import fr.codex.naturalis.challenge.ChallengeCard;
 
@@ -17,6 +18,16 @@ public class Player {
         this.challenge = null;
     }
 
+    @Override
+    public String toString() {
+        return "Player{" +
+                "playerID=" + playerID +
+                ", score=" + score +
+                ", challenge=" + challenge +
+                ", deck=" + deck +
+                '}';
+    }
+
     /**
      * Set the challenge card of the player.
      *
@@ -26,7 +37,6 @@ public class Player {
         Objects.requireNonNull(challenge);
         this.challenge = challenge;
     }
-
     /**
      * increase the player's score by the parameter entered.
      *
@@ -35,5 +45,13 @@ public class Player {
     public void increasePoint(int point) {
         if (point < 0) throw new IllegalArgumentException();
         score += point;
+    }
+    public void addCard(Card card) {
+        Objects.requireNonNull(card);
+        deck.add(card);
+    }
+    public void removeCard(Card card) {
+        Objects.requireNonNull(card);
+        deck.remove(card);
     }
 }

@@ -48,7 +48,7 @@ public class Game {
     /**
      * Start the game and its graphical interface.
      */
-    public void start() {
+    public void start(Player player) {
         // start the application, create a drawing area, full screen
         Application.run(backgroundColor, context -> {
             // Get the screen infos :
@@ -60,8 +60,17 @@ public class Game {
             startingSequence(context,width,height);
             if (placedCards.isEmpty()) {return;}
 
+            System.out.println(ressourceCardPile);
+            System.out.println(gildingCardPile);
+
+            // Choose 3 cards :
+            for (int i = 0; i < 3; i++) {
+                playerPickSequence(context,player,width,height);
+                System.out.println(player);
+            }
+
             for (;;) {
-                drawInformationBanner(context,width,height);
+                //drawInformationBanner(context,width,height);
                 drawPlacedCards(context);
 
                 Event event = context.pollOrWaitEvent(2147483647); //maximum int value
@@ -193,8 +202,81 @@ public class Game {
         }
         throw new EmptyStackException();
     }
-    private void playerPickCard(Player player) {
+    private void playerPickSequence(ApplicationContext context, Player player, int width, int height) {
+        Objects.requireNonNull(player);
+        var x1 = width/2 - (int)(1.5*ratio);
+        var x2 = width/2 + ratio/2;
+        var y = height/2 - ratio/4 - ratio;
 
+        RessourceCard ressourceCard1 = ressourceCardPile.getTOC1();
+        RessourceCard ressourceCard2 = ressourceCardPile.getTOC2();
+        RessourceCard ressourceCardFromPile = ressourceCardPile.getFirstOfPile();
+        ressourceCardFromPile.changeCoordinates(x1,y);
+        ressourceCard1.changeCoordinates(x1,y + ratio);
+        ressourceCard2.changeCoordinates(x1,y + 2*ratio);
+
+        GildingCard gildingCard1 = gildingCardPile.getTOC1();
+        GildingCard gildingCard2 = gildingCardPile.getTOC2();
+        GildingCard gildingCardFromPile = gildingCardPile.getFirstOfPile();
+        gildingCardFromPile.changeCoordinates(x2,y);
+        gildingCard1.changeCoordinates(x2,y + ratio);
+        gildingCard2.changeCoordinates(x2,y + 2*ratio);
+
+        var cardList = List.of(
+                ressourceCard1,ressourceCard2,ressourceCardFromPile,
+                gildingCard1,gildingCard2,gildingCardFromPile);
+
+        drawPlayerPick(context, cardList, width, height);
+        Card chosenCard = choosePickCard(context, cardList, width, height);
+        takeCardFromRightPile(player,chosenCard,ressourceCard1,ressourceCard2,ressourceCardFromPile,gildingCard1,gildingCard2,gildingCardFromPile);
+        context.renderFrame(graphics2D -> {graphics2D.clearRect(0,0,width,height);});
+    }
+    private Card choosePickCard(ApplicationContext context, List<Card> cardList, int width, int height) {
+        while (true) {
+            drawPlayerPick(context, cardList, width, height);
+            Event event = context.pollEvent();
+            if (event != null) {
+                if (event instanceof PointerEvent pointerEvent) {
+                    if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+                        int eventX = pointerEvent.location().x();
+                        int eventY = pointerEvent.location().y();
+                        for (Card card:cardList) {
+                            int cardX = card.getXCoordinate();
+                            int cardY = card.getYCoordinate();
+                            if ((eventX >= cardX && eventX <= cardX+ratio) && (eventY >= cardY && eventY <= cardY+ratio/2)) {
+                                return card;
+    }   }   }   }   }   }   }
+    private void drawPlayerPick(ApplicationContext context, List<Card> cardList, int width, int height) {
+        context.renderFrame(graphics2D -> {
+            graphics2D.setColor(secondaryColor);
+            graphics2D.fillRect(0, height /2-ratio/2-ratio, width,3*ratio);
+
+            var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
+            for (Card card : cardList) {
+                cardDrawingSequence.drawCard(card);
+            }
+        });
+    }
+    private void takeCardFromRightPile(Player player, Card chosenCard,
+                                       RessourceCard ressourceCard1, RessourceCard ressourceCard2, RessourceCard ressourceCardFromPile,
+                                       GildingCard gildingCard1, GildingCard gildingCard2, GildingCard gildingCardFromPile) {
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(chosenCard);
+        Objects.requireNonNull(ressourceCard1);
+        Objects.requireNonNull(ressourceCard2);
+        Objects.requireNonNull(ressourceCardFromPile);
+        Objects.requireNonNull(gildingCard1);
+        Objects.requireNonNull(gildingCard2);
+        Objects.requireNonNull(gildingCardFromPile);
+        if (chosenCard instanceof RessourceCard) {
+            if (chosenCard.equals(ressourceCard1)) { player.addCard(ressourceCardPile.removeTOC1()); return;}
+            if (chosenCard.equals(ressourceCard2)) { player.addCard(ressourceCardPile.removeTOC2()); return;}
+            if (chosenCard.equals(ressourceCardFromPile)) { player.addCard(ressourceCardPile.removeFromPile());}
+        } else if (chosenCard instanceof GildingCard) {
+            if (chosenCard.equals(gildingCard1)) { player.addCard(gildingCardPile.removeTOC1()); return;}
+            if (chosenCard.equals(gildingCard2)) { player.addCard(gildingCardPile.removeTOC2()); return;}
+            if (chosenCard.equals(gildingCardFromPile)) { player.addCard(gildingCardPile.removeFromPile());}
+        } else { throw new IllegalArgumentException();}
     }
     private void startPlacingSequence(ApplicationContext context ,int width, int height, int diff) {
         boolean placedACard = false;
@@ -252,6 +334,8 @@ public class Game {
                     // ignore for now.
                 }
             }
+            ressourceCardPile.setTOC1(); ressourceCardPile.setTOC2();
+            gildingCardPile.setTOC1(); gildingCardPile.setTOC2();
         } catch (Exception e) {
             System.out.println("couldn't read the file "+ "deck.txt" +".");
         }
@@ -272,12 +356,12 @@ public class Game {
         Corner topRight = cornerMap.get(lineList[3]);
         Corner botLeft = cornerMap.get(lineList[4]);
         Corner botRight = cornerMap.get(lineList[5]);
-        Ressource type = ressourceMap.get(lineList[7]);
+        Ressource type = ressourceMap.get("R:"+lineList[7]);
         int point;
         if (lineList[9].equals("None")) {
             point = 0;
         } else {
-            point = (int) lineList[9].charAt(3);
+            point = Integer.parseInt(lineList[9].split(":")[1]);
         }
         //Verso later.
         RessourceCard card = new RessourceCard(type,topLeft,topRight,botLeft,botRight,point);
@@ -289,23 +373,22 @@ public class Game {
         Corner topRight = cornerMap.get(lineList[3]);
         Corner botLeft = cornerMap.get(lineList[4]);
         Corner botRight = cornerMap.get(lineList[5]);
-        Ressource type = ressourceMap.get(lineList[7]);
+        Ressource type = ressourceMap.get("R:"+lineList[7]);
         int point;
         int len = lineList.length-1;
         if (lineList[len].equals("None")) {
             point = 0;
         } else {
-            point = (int) lineList[len].charAt(3);
+            point = Integer.parseInt(lineList[len].split(":")[1]);
         }
         var cost = new ArrayList<Ressource>();
-        for (int i = 10 ; i < (len-2); i++) {
-            cost.add(ressourceMap.get(lineList[i]));
+        for (int i = 9 ; i < (len-1); i++) {
+            cost.add(ressourceMap.get("R:"+lineList[i]));
         }
         //Verso later.
         GildingCard card = new GildingCard(type,point,topLeft,topRight,botLeft,botRight,List.copyOf(cost));
         gildingCardPile.add(card);
     }
-
     public void drawInformationBanner(ApplicationContext context ,int width, int height) {
         context.renderFrame(graphics2D -> {
             RessourceDrawingSequence ressourceDrawingSequence = new RessourceDrawingSequence(graphics2D,width);

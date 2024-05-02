@@ -55,6 +55,29 @@ public class GildingCard implements Card {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GildingCard that = (GildingCard) o;
+        return point == that.point && specialPointSystem == that.specialPointSystem && Objects.equals(type, that.type) && Objects.equals(topLeft, that.topLeft) && Objects.equals(topRight, that.topRight) && Objects.equals(bottomRight, that.bottomRight) && Objects.equals(bottomLeft, that.bottomLeft) && Objects.equals(cost, that.cost);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, topLeft, topRight, bottomRight, bottomLeft, point, cost, specialPointSystem);
+    }
+
+    @Override
+    public String toString() {
+        var str = new StringBuilder("Card :\n");
+        str.append(topLeft).append(" | ").append(topRight).append("\n");
+        str.append("- - - - ").append(point).append("pts").append(" - - - -\n");
+        str.append(bottomLeft).append(" | ").append(bottomRight).append("\n");
+        str.append(cost).append("\n");
+        return str.toString();
+    }
+
+    @Override
     public boolean topLeftObstructed() {
         return topLeftObstructed;
     }

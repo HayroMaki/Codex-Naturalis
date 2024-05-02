@@ -8,13 +8,17 @@ import java.util.Objects;
 
 public class Deck {
     private final ArrayList<Card> deck;
-    private final int deckMaxLength;
 
     public Deck() {
         this.deck = new ArrayList<Card>();
-        this.deckMaxLength = 3;
     }
 
+    @Override
+    public String toString() {
+        return "Deck{" +
+                "deck=" + deck +
+                '}';
+    }
     /**
      * remove a card from the deck.
      *

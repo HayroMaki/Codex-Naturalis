@@ -9,7 +9,7 @@ ResourceCard Recto R:Fungi R:Insect A:Manuscript Invisible Kingdom Fungi Scoring
 ResourceCard Recto A:Manuscript R:Insect Invisible R:Fungi Kingdom Insect Scoring None
 ResourceCard Recto R:Insect R:Plant A:Inkwell Invisible Kingdom Insect Scoring None
 ResourceCard Recto R:Insect Invisible Empty Empty Kingdom Insect Scoring D:1
-ResourceCard Recto Invisible Empty R:Insect R:insect Kingdom Insect Scoring None
+ResourceCard Recto Invisible Empty R:Insect R:Insect Kingdom Insect Scoring None
 ResourceCard Recto A:Quill Invisible R:Animal R:Fungi Kingdom Animal Scoring None
 ResourceCard Recto A:Manuscript Invisible R:Plant R:Animal Kingdom Plant Scoring None
 ResourceCard Recto R:Plant R:Animal Invisible A:Manuscript Kingdom Animal Scoring None
