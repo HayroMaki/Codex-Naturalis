@@ -99,7 +99,10 @@ public class Pile<Card> {
     public Card removeFromPile() {
         return pile.removeFirst();
     }
-
+    /**
+     * Add a card to the pile.
+     * @param card the card to add.
+     */
     public void add(Card card) {
         pile.add(card);
     }

@@ -30,6 +30,7 @@ public class Game {
     public final ArrayList<StartCard> startCards;
     private final Color backgroundColor;
     private final Color secondaryColor;
+    private final Color tertiaryColor;
 
     public Game(int ratio) {
         placedCards = new ArrayList<Card>();
@@ -44,6 +45,7 @@ public class Game {
 
         this.backgroundColor = new Color(250, 240, 230);
         this.secondaryColor = new Color(200, 170, 140);
+        this.tertiaryColor = new Color(160, 130, 70);
     }
     /**
      * Start the game and its graphical interface.
@@ -143,6 +145,9 @@ public class Game {
         context.renderFrame(graphics2D -> {
             graphics2D.setColor(secondaryColor);
             graphics2D.fillRect(0, height /2-ratio/2, width,ratio);
+            graphics2D.setColor(tertiaryColor);
+            graphics2D.fillRect(0, height /2-ratio/2, width,ratio/10);
+            graphics2D.fillRect(0, height /2+ratio/2-ratio/10, width,ratio/10);
             var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
             cardDrawingSequence.drawCard(card1);
             cardDrawingSequence.drawCard(card2);
@@ -250,7 +255,9 @@ public class Game {
         context.renderFrame(graphics2D -> {
             graphics2D.setColor(secondaryColor);
             graphics2D.fillRect(0, height /2-ratio/2-ratio, width,3*ratio);
-
+            graphics2D.setColor(tertiaryColor);
+            graphics2D.fillRect(0, height /2-ratio/2-ratio, width,ratio/10);
+            graphics2D.fillRect(0, height /2+3*(ratio/2)-ratio/10, width,ratio/10);
             var cardDrawingSequence = new CardDrawingSequence(graphics2D, ratio);
             for (Card card : cardList) {
                 cardDrawingSequence.drawCard(card);
