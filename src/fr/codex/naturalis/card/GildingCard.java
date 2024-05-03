@@ -147,7 +147,10 @@ public class GildingCard implements Card {
 
     @Override
     public List<Corner> getAllCorners() {
-        return List.of(topLeft,topRight,bottomLeft,bottomRight);
+        if (!isVerso) {
+            return List.of(topLeft,topRight,bottomLeft,bottomRight);
+        }
+        return List.of(Corner.empty,Corner.empty,Corner.empty,Corner.empty);
     }
 
     @Override

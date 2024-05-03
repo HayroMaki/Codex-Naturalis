@@ -62,19 +62,19 @@ public class RessourceCard implements Card {
     }
     @Override
     public boolean topLeftObstructed() {
-        return topLeftObstructed;
+        return (topLeftObstructed || topLeft.equals(Corner.invisible));
     }
     @Override
     public boolean topRightObstructed() {
-        return topRightObstructed;
+        return (topRightObstructed || topRight.equals(Corner.invisible));
     }
     @Override
     public boolean bottomLeftObstructed() {
-        return bottomLeftObstructed;
+        return (bottomLeftObstructed || bottomLeft.equals(Corner.invisible));
     }
     @Override
     public boolean bottomRightObstructed() {
-        return bottomRightObstructed;
+        return (bottomRightObstructed || bottomRight.equals(Corner.invisible));
     }
     @Override
     public void setTopLeftObstruction(boolean status) {
@@ -135,7 +135,10 @@ public class RessourceCard implements Card {
     }
     @Override
     public List<Corner> getAllCorners() {
-        return List.of(topLeft,topRight,bottomLeft,bottomRight);
+        if (!isVerso) {
+            return List.of(topLeft,topRight,bottomLeft,bottomRight);
+        }
+        return List.of(Corner.empty,Corner.empty,Corner.empty,Corner.empty);
     }
     @Override
     public boolean isVerso() {

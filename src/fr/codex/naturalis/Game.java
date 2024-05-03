@@ -286,28 +286,17 @@ public class Game {
         } else { throw new IllegalArgumentException();}
     }
     private void startPlacingSequence(ApplicationContext context ,int width, int height, int diff) {
-        boolean placedACard = false;
-        do {
-            var allUnobstructedCorners = PlacingCorner.getCornersList(placedCards,width,height,diff,ratio);
-            for (PlacingCorner placingCorner : allUnobstructedCorners) {
-                context.renderFrame(placingCorner::drawPlacableCorner);
-            }
-            Event event = context.pollOrWaitEvent(2147483647);
-            if (event != null) {
-                switch (event) {
-                    case PointerEvent pointerEvent :
-                        if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-
-                        }
-                        break;
-                    default : break;
-                }
-            }
-
-        } while (placedACard);
+        var availableCornerList = PlacingCorner.getCornersList(placedCards,width,height,diff,ratio);
     }
-    private void placingSequenceLoop() {
-
+    private void drawAvailableCorners(ApplicationContext context, List<PlacingCorner> availableCornerList, int width, int height, int diff) {
+        int size = (height / 2) - (height / 10);
+        int arc = (width / 5);
+        context.renderFrame(graphics2D -> {
+            for (PlacingCorner corner : availableCornerList) {
+                graphics2D.setColor(new Color(190, 255, 255));
+                graphics2D.drawRoundRect(corner.x(),corner.y(),size,size,arc,arc);
+            }
+        });
     }
     private void createPiles() {
         Map<String,Corner> cornerMap = Map.of(
