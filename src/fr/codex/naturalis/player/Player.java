@@ -4,6 +4,7 @@ import fr.codex.naturalis.card.Card;
 import fr.codex.naturalis.challenge.Challenge;
 import fr.codex.naturalis.challenge.ChallengeCard;
 
+import java.util.List;
 import java.util.Objects;
 
 public class Player {
@@ -54,4 +55,13 @@ public class Player {
         Objects.requireNonNull(card);
         deck.remove(card);
     }
+
+    public boolean deckIsOpen() { return deck.isOpen; }
+    public void setDeckOpen() { deck.isOpen = true; }
+    public void setDeckClosed() { deck.isOpen = false; }
+
+    public List<Card> getCards() { return deck.getCards(); }
+
+    public void addScore(int points) { score += points; }
+    public int getScore() { return score; }
 }

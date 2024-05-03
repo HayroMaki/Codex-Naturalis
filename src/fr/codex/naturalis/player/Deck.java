@@ -4,10 +4,12 @@ import fr.codex.naturalis.challenge.ChallengeCard;
 import fr.codex.naturalis.card.Card;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Deck {
     private final ArrayList<Card> deck;
+    public boolean isOpen;
 
     public Deck() {
         this.deck = new ArrayList<Card>();
@@ -38,6 +40,12 @@ public class Deck {
         Objects.requireNonNull(card);
         deck.add(card);
     }
+
+    public List<Card> getCards() {
+        var l = new ArrayList<Card>(deck);
+        return List.copyOf(l);
+    }
+
 
 }
 

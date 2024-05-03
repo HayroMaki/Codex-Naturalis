@@ -1,6 +1,7 @@
 package fr.codex.naturalis.card;
 
 import fr.codex.naturalis.corner.Corner;
+import fr.codex.naturalis.drawing.CardDrawingSequence;
 
 import java.awt.*;
 import java.util.List;
@@ -58,4 +59,11 @@ public interface Card {
      * @return true=Verso, false=Recto;
      */
     public boolean isVerso();
+
+    public void setVerso();
+
+    public void setRecto();
+
+    public void verso(CardDrawingSequence cds, int ratio, int cornerSize);
 }
+

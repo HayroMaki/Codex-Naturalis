@@ -2,6 +2,7 @@ package fr.codex.naturalis.card;
 
 import fr.codex.naturalis.corner.Corner;
 import fr.codex.naturalis.corner.Ressource;
+import fr.codex.naturalis.drawing.CardDrawingSequence;
 
 import java.awt.*;
 import java.util.List;
@@ -176,5 +177,17 @@ public class GildingCard implements Card {
         if (topRight != null) topRight.increase();
         if (bottomRight != null) bottomRight.increase();
         if (bottomLeft != null) bottomLeft.increase();
+    }
+    @Override
+    public void setVerso() { isVerso = true; }
+    @Override
+    public void setRecto() { isVerso = false; }
+
+    public Ressource getType() {
+        return type;
+    }
+
+    public void verso(CardDrawingSequence cds, int ratio, int cornerSize) {
+        cds.drawRessource(type, getXCoordinate()+ratio/2-cornerSize/4, getYCoordinate()+ratio/4-cornerSize/4);
     }
 }

@@ -9,6 +9,7 @@ import fr.codex.naturalis.card.GildingCard;
 import fr.codex.naturalis.card.RessourceCard;
 import fr.codex.naturalis.card.StartCard;
 import fr.codex.naturalis.drawing.CardDrawingSequence;
+import fr.codex.naturalis.drawing.DeckDrawingSequence;
 import fr.codex.naturalis.drawing.RessourceDrawingSequence;
 import fr.codex.naturalis.placing.PlacingCorner;
 import fr.codex.naturalis.player.Player;
@@ -57,31 +58,34 @@ public class Game {
             var width = context.getScreenInfo().width();
             var height = context.getScreenInfo().height();
             int diff = (int)(ratio/((float) 16/3));
-
             // Choose a StartCard :
             startingSequence(context,width,height);
             if (placedCards.isEmpty()) {return;}
-
-            System.out.println(ressourceCardPile);
-            System.out.println(gildingCardPile);
-
             // Choose 3 cards :
-            for (int i = 0; i < 3; i++) {
-                playerPickSequence(context,player,width,height);
-                System.out.println(player);
-            }
-
+            for (int i = 0; i < 3; i++) { playerPickSequence(context,player,width,height);}
+            player.setDeckClosed();
             for (;;) {
+                context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
+
                 //drawInformationBanner(context,width,height);
                 drawPlacedCards(context);
+                if (player.deckIsOpen()) {
+                    drawDeck(context, player, width, height);
+                } else {
+                    drawHiddenDeck(context, width, height);
+                }
 
                 Event event = context.pollOrWaitEvent(2147483647); //maximum int value
                 if (event != null) {
-                    System.out.println(event);
                     switch (event) {
                         case PointerEvent pointerEvent -> {
                             if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-                                System.out.println(pointerEvent.location());
+                                if(clickIsOnLine(event, width, height) && !player.deckIsOpen()) {
+                                    player.setDeckOpen();
+                                }
+                                if (clickIsOnLine(event, width, height - height / 3) && player.deckIsOpen()) {
+                                    player.setDeckClosed();
+                                }
                             }
                         }
                         case KeyboardEvent keyboardEvent -> {
@@ -94,7 +98,6 @@ public class Game {
                         }
                     }
                 }
-                context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
             }
         });
     }
@@ -404,5 +407,56 @@ public class Game {
                 cardDrawingSequence.drawCard(card);
             }
         });
+    }
+
+    private void drawHiddenDeck(ApplicationContext context, int width, int height) {
+        Objects.requireNonNull(context);
+        context.renderFrame(graphics2D -> {
+            var hiddenDeckDrawingSequence = new DeckDrawingSequence(graphics2D, width, height, secondaryColor, tertiaryColor);
+            hiddenDeckDrawingSequence.drawDeckLine(0, height-height/32);
+        });
+    }
+
+    private void drawDeck(ApplicationContext context, Player player, int width, int height) {
+        Objects.requireNonNull(player);
+        Objects.requireNonNull(context);
+        player.setDeckOpen();
+        context.renderFrame(graphics2D -> {
+            var deckDrawingSequence = new DeckDrawingSequence(graphics2D, width, height, secondaryColor, tertiaryColor);
+            deckDrawingSequence.drawDeck(0, height-height/3);
+            var drawingSequence = new CardDrawingSequence(graphics2D, ratio);
+            double count = 0.5;
+            for(Card card : player.getCards()) {
+                //card.changeCoordinates(card.getXCoordinate()count+ratio, height-(height/4));
+                card.changeCoordinates((int) (ratio*count), height - (height/4));
+                drawingSequence.drawCard(card);
+                count+= (double) 5/3;
+            }
+            drawHiddenDeck(context, width, height-height/3);
+        });
+    }
+    private boolean clickIsOnLine(Event event, int width, int height) {
+        if(event == null) {
+            return false;
+        }
+        return event instanceof PointerEvent && ((PointerEvent) event).location().x() >= 0 && ((PointerEvent) event).location().x() <= width && ((PointerEvent) event).location().y() <= height && ((PointerEvent) event).location().y() >= height-height/32;
+    }
+    private Card playerSelectedACard(Event event, Player player) {
+        if (event != null) {
+            if(event instanceof PointerEvent pointerEvent) {
+                if (pointerEvent.action()== PointerEvent.Action.POINTER_UP) {
+                    int x = pointerEvent.location().x();
+                    int y = pointerEvent.location().y();
+                    for (Card card : player.getCards()) {
+                        int cardX = card.getXCoordinate();
+                        int cardY = card.getYCoordinate();
+                        if(x >= cardX && x <= cardX+ratio && y >= cardY && y <= cardY+ratio/2) {
+                            return card;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

@@ -47,9 +47,29 @@ public class CardDrawingSequence {
             else if (card instanceof GildingCard) drawGildingCardRecto(card, x, y);
 
         } else if (card.isVerso()) {
-            //for later
+            if (card instanceof StartCard); //drawStartVerso(card);
+            else {
+                drawNormalVerso(card);
+            }
         }
     }
+
+    public void drawNormalVerso(Card card) {
+        Objects.requireNonNull(card);
+        int x = card.getXCoordinate();
+        int y = card.getYCoordinate();
+
+        // Draws the card's shape and fills it.
+        graphics2D.setColor(card.getColor());
+        graphics2D.fillRoundRect(x, y, width, height, arcDiameter, arcDiameter);
+        if(card instanceof RessourceCard) {
+            ((RessourceCard) card).verso(this, width, cornerSize);
+        }
+        if (card instanceof GildingCard) {
+            ((GildingCard) card).verso(this, width, cornerSize);
+        }
+    }
+
     /**
      * Draw the recto side of a RessourceCard.
      *
@@ -255,7 +275,7 @@ public class CardDrawingSequence {
      * @param x
      * @param y
      */
-    private void drawRessource(Ressource ressource, int x, int y) {
+    public void drawRessource(Ressource ressource, int x, int y) {
         if (ressource.equals(Corner.animal)) {
             drawAnimal(ressource, x, y);
         } else if (ressource.equals(Corner.fungi)) {

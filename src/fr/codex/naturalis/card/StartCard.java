@@ -2,6 +2,7 @@ package fr.codex.naturalis.card;
 
 import fr.codex.naturalis.corner.Corner;
 import fr.codex.naturalis.corner.Ressource;
+import fr.codex.naturalis.drawing.CardDrawingSequence;
 
 import java.awt.*;
 import java.util.List;
@@ -127,6 +128,17 @@ public class StartCard implements Card {
     public boolean isVerso() {
         return isVerso;
     }
+
+    @Override
+    public void setVerso() { isVerso = true; }
+    @Override
+    public void setRecto() { isVerso = false; }
+
+    @Override
+    public void verso(CardDrawingSequence cds, int ratio, int cornerSize) {
+        //Later
+    }
+
     /**
      * Change the coordinates of the card and place it, making it unmovable.
      *
