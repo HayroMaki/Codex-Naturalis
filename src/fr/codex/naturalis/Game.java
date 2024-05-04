@@ -84,7 +84,8 @@ public class Game {
                                 if (player.deckIsOpen()) {
                                     Card selectedCard = playerSelectedACard(event,player);
                                     if (selectedCard != null) {
-                                        cardPlacingSequence(context, selectedCard, width, height, diff);
+                                        cardPlacingSequence(context,player,selectedCard,width,height,diff);
+                                        playerPickSequence(context,player,width,height);
                                     }
                                 }
                             }
@@ -283,7 +284,7 @@ public class Game {
             if (chosenCard.equals(gildingCardFromPile)) { player.addCard(gildingCardPile.removeFromPile());}
         } else { throw new IllegalArgumentException();}
     }
-    private void cardPlacingSequence(ApplicationContext context, Card card, int width, int height, int diff) {
+    private void cardPlacingSequence(ApplicationContext context, Player player, Card card, int width, int height, int diff) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(card);
         var availableCornerList = PlacingCorner.getCornersList(placedCards,ratio,ratio/2,diff,ratio);
@@ -297,22 +298,28 @@ public class Game {
             if (event != null) {
                 if (event instanceof PointerEvent pointerEvent) {
                     if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-                        return;
+                        PlacingCorner clickedCorner = checkPlayerPickCorner((PointerEvent) event,availableCornerList);
+                        if (clickedCorner != null) {
+                            placeCardOnCorner(clickedCorner,card,diff);
+                            break;
+                        }
                     }
                 }
                 context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
             }
         }
+        player.setDeckClosed();
     }
-    private boolean checkPlayerPickCorner(PointerEvent event, Map<Point,PlacingCorner> availableCorners) {
+    private PlacingCorner checkPlayerPickCorner(PointerEvent event, Map<Point,PlacingCorner> availableCorners) {
         Objects.requireNonNull(event);
+        Objects.requireNonNull(availableCorners);
         int size = (ratio/4) - (ratio/20) - ((ratio/4) - (ratio/20))/15;
         for (Point point: availableCorners.keySet()) {
-            if ((event.location().x() >= point.x && event.location().x() <= point.x+size) && (event.location().y() >= point.y && event.location().y() <= point.y)) {
-
+            if ((event.location().x() >= point.x && event.location().x() <= point.x+size) && (event.location().y() >= point.y && event.location().y() <= point.y+size)) {
+                return availableCorners.get(point);
             }
         }
-        return false;
+        return null;
     }
     private void drawAvailableCorners(ApplicationContext context, List<PlacingCorner> availableCornerList) {
         Objects.requireNonNull(context);
@@ -325,6 +332,25 @@ public class Game {
                 graphics2D.drawRect(corner.x(),corner.y(),size,size);
             }
         });
+    }
+    private void placeCardOnCorner(PlacingCorner corner, Card card, int diff) {
+        Objects.requireNonNull(corner);
+        Objects.requireNonNull(card);
+        switch (corner.whichCorner()) {
+            case "TL" -> {
+                card.place(corner.x()-ratio+diff, corner.y()-ratio/2+diff);
+            }
+            case "TR" -> {
+                card.place(corner.x(),corner.y()-ratio/2+diff);
+            }
+            case "BL" -> {
+                card.place(corner.x()-ratio+diff,corner.y());
+            }
+            case "BR" -> {
+                card.place(corner.x(),corner.y());
+            }
+        }
+        placedCards.add(card);
     }
     private void createPiles() {
         Map<String,Corner> cornerMap = Map.of(
