@@ -52,7 +52,6 @@ public class Game {
      * Start the game and its graphical interface.
      */
     public void start(Player player) {
-        // start the application, create a drawing area, full screen
         Application.run(backgroundColor, context -> {
             // Get the screen infos :
             var width = context.getScreenInfo().width();
@@ -65,26 +64,28 @@ public class Game {
             for (int i = 0; i < 3; i++) { playerPickSequence(context,player,width,height);}
             player.setDeckClosed();
             for (;;) {
+                // Clear the screen for next frame :
                 context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
-
                 //drawInformationBanner(context,width,height);
                 drawPlacedCards(context);
-                if (player.deckIsOpen()) {
-                    drawDeck(context, player, width, height);
-                } else {
-                    drawHiddenDeck(context, width, height);
-                }
+                // Draw (or not) the deck :
+                if (player.deckIsOpen()) { drawDeck(context, player, width, height);}
+                else { drawHiddenDeck(context, width, height);}
 
                 Event event = context.pollOrWaitEvent(2147483647); //maximum int value
                 if (event != null) {
                     switch (event) {
                         case PointerEvent pointerEvent -> {
                             if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
-                                if(clickIsOnLine(event, width, height) && !player.deckIsOpen()) {
-                                    player.setDeckOpen();
-                                }
-                                if (clickIsOnLine(event, width, height - height / 3) && player.deckIsOpen()) {
-                                    player.setDeckClosed();
+                                // Open or close the deck :
+                                if(clickIsOnLine(event, width, height) && !player.deckIsOpen()) {player.setDeckOpen();}
+                                if(clickIsOnLine(event, width, height - height / 3) && player.deckIsOpen()) {player.setDeckClosed();}
+                                // Check if a card from the deck is selected and launch the placing sequence :
+                                if (player.deckIsOpen()) {
+                                    Card selectedCard = playerSelectedACard(event,player);
+                                    if (selectedCard != null) {
+                                        cardPlacingSequence(context, selectedCard, width, height, diff);
+                                    }
                                 }
                             }
                         }
@@ -272,12 +273,6 @@ public class Game {
                                        GildingCard gildingCard1, GildingCard gildingCard2, GildingCard gildingCardFromPile) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(chosenCard);
-        Objects.requireNonNull(ressourceCard1);
-        Objects.requireNonNull(ressourceCard2);
-        Objects.requireNonNull(ressourceCardFromPile);
-        Objects.requireNonNull(gildingCard1);
-        Objects.requireNonNull(gildingCard2);
-        Objects.requireNonNull(gildingCardFromPile);
         if (chosenCard instanceof RessourceCard) {
             if (chosenCard.equals(ressourceCard1)) { player.addCard(ressourceCardPile.removeTOC1()); return;}
             if (chosenCard.equals(ressourceCard2)) { player.addCard(ressourceCardPile.removeTOC2()); return;}
@@ -288,16 +283,46 @@ public class Game {
             if (chosenCard.equals(gildingCardFromPile)) { player.addCard(gildingCardPile.removeFromPile());}
         } else { throw new IllegalArgumentException();}
     }
-    private void startPlacingSequence(ApplicationContext context ,int width, int height, int diff) {
-        var availableCornerList = PlacingCorner.getCornersList(placedCards,width,height,diff,ratio);
+    private void cardPlacingSequence(ApplicationContext context, Card card, int width, int height, int diff) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(card);
+        var availableCornerList = PlacingCorner.getCornersList(placedCards,ratio,ratio/2,diff,ratio);
+        System.out.println(availableCornerList);
+        drawAvailableCorners(context,List.copyOf(availableCornerList.values()));
+        while (true) {
+            drawPlacedCards(context);
+            //drawInformationBanner(context,width,height);
+            drawAvailableCorners(context,List.copyOf(availableCornerList.values()));
+            Event event = context.pollOrWaitEvent(2147483647);
+            if (event != null) {
+                if (event instanceof PointerEvent pointerEvent) {
+                    if (pointerEvent.action() == PointerEvent.Action.POINTER_UP) {
+                        return;
+                    }
+                }
+                context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
+            }
+        }
     }
-    private void drawAvailableCorners(ApplicationContext context, List<PlacingCorner> availableCornerList, int width, int height, int diff) {
-        int size = (height / 2) - (height / 10);
-        int arc = (width / 5);
+    private boolean checkPlayerPickCorner(PointerEvent event, Map<Point,PlacingCorner> availableCorners) {
+        Objects.requireNonNull(event);
+        int size = (ratio/4) - (ratio/20) - ((ratio/4) - (ratio/20))/15;
+        for (Point point: availableCorners.keySet()) {
+            if ((event.location().x() >= point.x && event.location().x() <= point.x+size) && (event.location().y() >= point.y && event.location().y() <= point.y)) {
+
+            }
+        }
+        return false;
+    }
+    private void drawAvailableCorners(ApplicationContext context, List<PlacingCorner> availableCornerList) {
+        Objects.requireNonNull(context);
+        Objects.requireNonNull(availableCornerList);
+        int size = (ratio/4) - (ratio/20) - ((ratio/4) - (ratio/20))/15;
+
         context.renderFrame(graphics2D -> {
+            graphics2D.setColor(new Color(190, 255, 255));
             for (PlacingCorner corner : availableCornerList) {
-                graphics2D.setColor(new Color(190, 255, 255));
-                graphics2D.drawRoundRect(corner.x(),corner.y(),size,size,arc,arc);
+                graphics2D.drawRect(corner.x(),corner.y(),size,size);
             }
         });
     }
@@ -408,7 +433,6 @@ public class Game {
             }
         });
     }
-
     private void drawHiddenDeck(ApplicationContext context, int width, int height) {
         Objects.requireNonNull(context);
         context.renderFrame(graphics2D -> {
@@ -416,7 +440,6 @@ public class Game {
             hiddenDeckDrawingSequence.drawDeckLine(0, height-height/32);
         });
     }
-
     private void drawDeck(ApplicationContext context, Player player, int width, int height) {
         Objects.requireNonNull(player);
         Objects.requireNonNull(context);
@@ -425,12 +448,12 @@ public class Game {
             var deckDrawingSequence = new DeckDrawingSequence(graphics2D, width, height, secondaryColor, tertiaryColor);
             deckDrawingSequence.drawDeck(0, height-height/3);
             var drawingSequence = new CardDrawingSequence(graphics2D, ratio);
-            double count = 0.5;
+            int x = width/2 -ratio/2 -2*ratio;
             for(Card card : player.getCards()) {
                 //card.changeCoordinates(card.getXCoordinate()count+ratio, height-(height/4));
-                card.changeCoordinates((int) (ratio*count), height - (height/4));
+                card.changeCoordinates(x, height - (height/4));
                 drawingSequence.drawCard(card);
-                count+= (double) 5/3;
+                x += 2*ratio;
             }
             drawHiddenDeck(context, width, height-height/3);
         });

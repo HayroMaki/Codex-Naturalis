@@ -4,9 +4,8 @@ import fr.codex.naturalis.card.Card;
 
 import javax.swing.text.Segment;
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
 public record PlacingCorner(int x, int y, Card card, int ratio, String whichCorner) {
     public PlacingCorner {
@@ -23,16 +22,17 @@ public record PlacingCorner(int x, int y, Card card, int ratio, String whichCorn
         graphics2D.drawRoundRect(x,y,size,size,arc,arc);
     }
 
-    public static List<PlacingCorner> getCornersList(ArrayList<Card> placedCards, int width, int height, int diff, int ratio){
-        var corners = new ArrayList<PlacingCorner>();
+    public static Map<Point,PlacingCorner> getCornersList(ArrayList<Card> placedCards, int width, int height, int diff, int ratio){
+        var cornersMap = new HashMap<Point,PlacingCorner>();
         for (Card card : placedCards) {
             int xCoord = card.getXCoordinate();
             int yCoord = card.getYCoordinate();
-            if (card.topLeftObstructed()) corners.add(new PlacingCorner(xCoord, yCoord, card, ratio,"TL"));
-            if (card.topRightObstructed()) corners.add(new PlacingCorner(xCoord+width-diff, yCoord, card, ratio,"TR"));
-            if (card.bottomLeftObstructed()) corners.add(new PlacingCorner(xCoord,yCoord+height-diff, card, ratio,"BL"));
-            if (card.bottomRightObstructed()) corners.add(new PlacingCorner(xCoord+width-diff,yCoord+height-diff, card, ratio,"BR"));
+            if (!card.topLeftObstructed()) cornersMap.put(new Point(xCoord,yCoord),new PlacingCorner(xCoord, yCoord, card, ratio,"TL"));
+            if (!card.topRightObstructed()) cornersMap.put(new Point(xCoord+width-diff, yCoord),new PlacingCorner(xCoord+width-diff, yCoord, card, ratio,"TR"));
+            if (!card.bottomLeftObstructed()) cornersMap.put(new Point(xCoord,yCoord+height-diff),new PlacingCorner(xCoord,yCoord+height-diff, card, ratio,"BL"));
+            if (!card.bottomRightObstructed()) cornersMap.put(new Point(xCoord+width-diff,yCoord+height-diff),new PlacingCorner(xCoord+width-diff,yCoord+height-diff, card, ratio,"BR"));
         }
-        return List.copyOf(corners);
+        //go through the Map and check for each corner, depending on "whichCorner", the 3 other corners;
+        return Map.copyOf(cornersMap);
     }
 }
