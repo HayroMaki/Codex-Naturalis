@@ -36,7 +36,7 @@ public class Game {
     public Game(int ratio) {
         placedCards = new ArrayList<Card>();
 
-        if (ratio < 100) throw new IllegalArgumentException("ratio must be at least of 100.");
+        if (ratio < 100) throw new IllegalArgumentException("width must be at least of 100.");
         this.ratio = ratio;
 
         ressourceCardPile = new Pile<RessourceCard>();
@@ -287,7 +287,7 @@ public class Game {
     private void cardPlacingSequence(ApplicationContext context, Player player, Card card, int width, int height, int diff) {
         Objects.requireNonNull(context);
         Objects.requireNonNull(card);
-        var availableCornerList = PlacingCorner.getCornersList(placedCards,ratio,ratio/2,diff,ratio);
+        var availableCornerList = PlacingCorner.getCornersList(placedCards,ratio,ratio/2,diff);
         System.out.println(availableCornerList);
         drawAvailableCorners(context,List.copyOf(availableCornerList.values()));
         while (true) {
@@ -485,7 +485,7 @@ public class Game {
             var drawingSequence = new CardDrawingSequence(graphics2D, ratio);
             int x = width/2 -ratio/2 -2*ratio;
             for(Card card : player.getCards()) {
-                //card.changeCoordinates(card.getXCoordinate()count+ratio, height-(height/4));
+                //card.changeCoordinates(card.getXCoordinate()count+width, height-(height/4));
                 card.changeCoordinates(x, height - (height/4));
                 drawingSequence.drawCard(card);
                 x += 2*ratio;
