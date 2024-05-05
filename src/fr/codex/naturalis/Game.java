@@ -1,5 +1,4 @@
 package fr.codex.naturalis;
-
 import com.github.forax.zen.*;
 import com.github.forax.zen.Event;
 import fr.codex.naturalis.corner.Corner;
@@ -21,10 +20,8 @@ import java.util.*;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
-
 public class Game {
     private final int ratio;
-    private ArrayList<Card> allCards;
     public final Pile<RessourceCard> ressourceCardPile;
     public final Pile<GildingCard> gildingCardPile;
     private final ArrayList<Card> placedCards;
@@ -65,9 +62,9 @@ public class Game {
             player.setDeckClosed();
             for (;;) {
                 // Clear the screen for next frame :
-                context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
-                //drawInformationBanner(context,width,height);
+                context.renderFrame(graphics2D -> graphics2D.clearRect(0,0,width,height));
                 drawPlacedCards(context);
+                drawInformationBanner(context,width,height);
                 // Draw (or not) the deck :
                 if (player.deckIsOpen()) { drawDeck(context, player, width, height);}
                 else { drawHiddenDeck(context, width, height);}
@@ -113,7 +110,7 @@ public class Game {
         Objects.requireNonNull(context);
         StartCard chosenCard = chooseStartingCard(context, width, height);
         chosenCard.place(width/2-ratio/2,height/2-ratio/4);
-        context.renderFrame(graphics2D -> {graphics2D.clearRect(0,0,width,height);});
+        context.renderFrame(graphics2D -> graphics2D.clearRect(0,0,width,height));
     }
     /**
      * Take 2 random cards and place them in the middle of the screen for the player to choose one.
@@ -175,7 +172,7 @@ public class Game {
         Objects.requireNonNull(context);
         Objects.requireNonNull(card1);
         Objects.requireNonNull(card2);
-        StartCard chosenCard = null;
+        StartCard chosenCard;
         while (true) {
             drawStartCardSelection(context, width, height, card1, card2);
             Event event = context.pollEvent();
@@ -239,7 +236,7 @@ public class Game {
         drawPlayerPick(context, cardList, width, height);
         Card chosenCard = choosePickCard(context, cardList, width, height);
         takeCardFromRightPile(player,chosenCard,ressourceCard1,ressourceCard2,ressourceCardFromPile,gildingCard1,gildingCard2,gildingCardFromPile);
-        context.renderFrame(graphics2D -> {graphics2D.clearRect(0,0,width,height);});
+        context.renderFrame(graphics2D -> graphics2D.clearRect(0,0,width,height));
     }
     private Card choosePickCard(ApplicationContext context, List<Card> cardList, int width, int height) {
         while (true) {
@@ -288,11 +285,12 @@ public class Game {
         Objects.requireNonNull(context);
         Objects.requireNonNull(card);
         var availableCornerList = PlacingCorner.getCornersList(placedCards,ratio,ratio/2,diff);
-        System.out.println(availableCornerList);
+        drawPlacedCards(context);
+        drawInformationBanner(context,width,height);
         drawAvailableCorners(context,List.copyOf(availableCornerList.values()));
         while (true) {
             drawPlacedCards(context);
-            //drawInformationBanner(context,width,height);
+            drawInformationBanner(context,width,height);
             drawAvailableCorners(context,List.copyOf(availableCornerList.values()));
             Event event = context.pollOrWaitEvent(2147483647);
             if (event != null) {
@@ -306,7 +304,7 @@ public class Game {
                         }
                     }
                 }
-                context.renderFrame(graphics2D -> { graphics2D.clearRect(0,0,width,height);});
+                context.renderFrame(graphics2D -> graphics2D.clearRect(0,0,width,height));
             }
         }
         player.setDeckClosed();
