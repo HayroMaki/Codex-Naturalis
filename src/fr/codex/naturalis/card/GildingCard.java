@@ -80,47 +80,38 @@ public class GildingCard implements Card {
 
     @Override
     public boolean topLeftObstructed() {
-        return topLeftObstructed;
+        return (topLeftObstructed || topLeft.equals(Corner.invisible));
     }
-
     @Override
     public boolean topRightObstructed() {
-        return topRightObstructed;
+        return (topRightObstructed || topRight.equals(Corner.invisible));
     }
-
     @Override
     public boolean bottomLeftObstructed() {
-        return bottomLeftObstructed;
+        return (bottomLeftObstructed || bottomLeft.equals(Corner.invisible));
     }
-
     @Override
     public boolean bottomRightObstructed() {
-        return bottomRightObstructed;
+        return (bottomRightObstructed || bottomRight.equals(Corner.invisible));
     }
-
     @Override
     public void setTopLeftObstruction(boolean status) {
         topLeftObstructed = status;
     }
-
     @Override
     public void setTopRightObstruction(boolean status) {
         topRightObstructed = status;
     }
-
     @Override
     public void setBottomLeftObstruction(boolean status) {
         bottomLeftObstructed = status;
     }
-
     @Override
-    public void seBottomRightObstruction(boolean status) {
+    public void setBottomRightObstruction(boolean status) {
         bottomRightObstructed = status;
     }
-
     /**
      * Change the coordinates of the card without placing it.
-     *
      * @param x horizontal coordinate.
      * @param y vertical coordinate.
      */
@@ -130,22 +121,18 @@ public class GildingCard implements Card {
             this.coordinate = new Point(x, y);
         }
     }
-
     @Override
     public int getXCoordinate() {
         return coordinate.x;
     }
-
     @Override
     public int getYCoordinate() {
         return coordinate.y;
     }
-
     @Override
     public Color getColor() {
         return type.getMainColor();
     }
-
     @Override
     public List<Corner> getAllCorners() {
         if (!isVerso) {
@@ -153,12 +140,10 @@ public class GildingCard implements Card {
         }
         return List.of(Corner.empty,Corner.empty,Corner.empty,Corner.empty);
     }
-
     @Override
     public boolean isVerso() {
         return isVerso;
     }
-
     public int getPoint() {
         return point;
     }
@@ -173,10 +158,10 @@ public class GildingCard implements Card {
     public void place(int x, int y) {
         changeCoordinates(x, y);
         isPlaced = true;
-        if (topLeft != null) topLeft.increase();
-        if (topRight != null) topRight.increase();
-        if (bottomRight != null) bottomRight.increase();
-        if (bottomLeft != null) bottomLeft.increase();
+        topLeft.increase();
+        topRight.increase();
+        bottomRight.increase();
+        bottomLeft.increase();
     }
     @Override
     public void setVerso() { isVerso = true; }

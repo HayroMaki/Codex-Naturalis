@@ -301,6 +301,7 @@ public class Game {
                         PlacingCorner clickedCorner = checkPlayerPickCorner((PointerEvent) event,availableCornerList);
                         if (clickedCorner != null) {
                             placeCardOnCorner(clickedCorner,card,diff);
+                            player.removeCard(card);
                             break;
                         }
                     }
@@ -339,15 +340,23 @@ public class Game {
         switch (corner.whichCorner()) {
             case "TL" -> {
                 card.place(corner.x()-ratio+diff, corner.y()-ratio/2+diff);
+                card.setBottomRightObstruction(true);
+                corner.card().setTopLeftObstruction(true);
             }
             case "TR" -> {
                 card.place(corner.x(),corner.y()-ratio/2+diff);
+                card.setBottomLeftObstruction(true);
+                corner.card().setTopRightObstruction(true);
             }
             case "BL" -> {
                 card.place(corner.x()-ratio+diff,corner.y());
+                card.setTopRightObstruction(true);
+                corner.card().setBottomLeftObstruction(true);
             }
             case "BR" -> {
                 card.place(corner.x(),corner.y());
+                card.setTopLeftObstruction(true);
+                corner.card().setBottomRightObstruction(true);
             }
         }
         placedCards.add(card);

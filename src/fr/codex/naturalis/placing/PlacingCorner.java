@@ -32,7 +32,7 @@ public record PlacingCorner(int x, int y, Card card, int ratio, String whichCorn
             if (!card.bottomLeftObstructed()) cornersMap.put(new Point(xCoord,yCoord+height-diff),new PlacingCorner(xCoord,yCoord+height-diff, card, ratio,"BL"));
             if (!card.bottomRightObstructed()) cornersMap.put(new Point(xCoord+width-diff,yCoord+height-diff),new PlacingCorner(xCoord+width-diff,yCoord+height-diff, card, ratio,"BR"));
         }
-        //go through the Map and check for each corner, depending on "whichCorner", the 3 other corners;
+        // go through the Map and check for each corner, depending on "whichCorner", the 3 other corners;
         return Map.copyOf(cornersMap);
     }
 }

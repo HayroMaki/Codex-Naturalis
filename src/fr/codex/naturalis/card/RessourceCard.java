@@ -90,7 +90,7 @@ public class RessourceCard implements Card {
         bottomLeftObstructed = status;
     }
     @Override
-    public void seBottomRightObstruction(boolean status) {
+    public void setBottomRightObstruction(boolean status) {
         bottomRightObstructed = status;
     }
     @Override

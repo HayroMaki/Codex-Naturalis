@@ -14,7 +14,7 @@ public interface Card {
     public void setTopLeftObstruction(boolean status);
     public void setTopRightObstruction(boolean status);
     public void setBottomLeftObstruction(boolean status);
-    public void seBottomRightObstruction(boolean status);
+    public void setBottomRightObstruction(boolean status);
     /**
      * Change the coordinates of the card without placing it.
      *
